@@ -27,6 +27,11 @@
         width:100%;
 
     }
+    li {
+        text-align: left;
+        margin: 5px 0;
+
+    }
 
     .relay-text{
         text-align: left;
@@ -41,6 +46,11 @@
     .temp-input{
         width:25%;
     }
+    .card-body {
+
+        align-content: center;
+    }
+
 
 </style>
 
@@ -52,14 +62,14 @@
 </div>
 
 <div class="container">
-    <div class="card-deck mb-3 text-center">
-        <div class="card mb-4 box-shadow">
+    <div class="card-deck text-center">
+        <div class="card box-shadow mx-auto" style="width: 18rem;">
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">Readings</h4>
             </div>
             <div class="card-body">
 
-                <ul class="list-unstyled mt-3 mb-4">
+                <ul class="list-inline" >
 
                     <li>Temp 80</li>
                     <li>Co2 600 ppm</li>
@@ -69,26 +79,27 @@
 
             </div>
         </div>
-        <div class="card mb-4 box-shadow">
+        <div class="card box-shadow mx-auto" style="width: 18rem;" >
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">Wifi</h4>
             </div>
             <div class="card-body">
 
-                Enable Local Network : <input type="checkbox"/>
-                <ul class="list-unstyled mt-3 mb-4">
 
-                    SSID <input />
-                    Pass <input />
+                <ul class="list-unstyled">
+                    <li>Enable Local Network : <input type="checkbox"/></li>
+                    <li>SSID <input /></li>
+                    <li>Pass <input /></li>
 
 
                 </ul>
-                Enable AP Network : <input class="c" type="checkbox"/>
 
-                <ul class="list-unstyled mt-3 mb-4">
+                <ul class="list-unstyled">
 
-                    SSID <input value="mush-room"/>
-                    Pass <input value="86753099"/>
+                    <li>Enable AP Network : <input class="c" type="checkbox"/></li>
+
+                    <li>SSID <input value="mush-room"/></li>
+                    <li>Pass <input value="86753099"/></li>
 
 
                 </ul>
@@ -99,19 +110,20 @@
             </div>
         </div>
 
-        <div class="card mb-4 box-shadow">
+        <div class="card box-shadow mx-auto" style="width: 18rem;">
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">Relay Limit</h4>
             </div>
+
             <div class="card-body">
 
 
 
                 <div class="row">
 
-                    <div class="col-md-4 mb-4 d-flex"></div>
 
-                    <div class="col-md-4 mb-4 d-flex">
+
+
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table>
@@ -141,27 +153,21 @@
 
 
                 </ul>
-                        </div>
 
-                    <div class="col-md-4 mb-4 d-flex"></div>
-
-                    </div>
-
-
-
-
-
-                <button type="button" class="btn btn-lg btn-block btn-primary">Save</button>
             </div>
+                <button type="button" class="btn btn-lg btn-block btn-primary">Save</button>
         </div>
 
-        <div class="card col-lg-4 col-md-12 mb-4 box-shadow">
+        </div>
+
+        <div class="card box-shadow mx-auto" style="width: 18rem;">
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">Relay Toggle</h4>
             </div>
             <div class="row">
-                <div class="col-md-4 mb-4 d-flex"></div>
-            <div class="col-md-4 mb-4 d-flex">
+
+
+
 
                 <div class="card-body">
 
@@ -190,24 +196,13 @@
                             <span class="badge badge-primary badge-pill">2</span>
                         </li>
 
-
-
                     </ul>
 
-                    <button type="button" class="btn btn-lg btn-block btn-primary">Save</button>
+                </div>
 
             </div>
-
+            <button type="button" class="btn btn-lg btn-block btn-primary">Save</button>
         </div>
-
-                <div class="col-md-4 mb-4 d-flex" "></div>
-
-
-
-    </div>
-
-
-</div>
 
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">
