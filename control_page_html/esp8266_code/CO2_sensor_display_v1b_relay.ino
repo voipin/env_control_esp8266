@@ -30,7 +30,7 @@ const char* ssid = "mush-room";
 const char* pass = "86753099";
 
 const char* wifi_ssid = "KidsWifi";
-const char* wifi_pass = "xxyy123456";
+const char* wifi_pass = "";
 
 
 
