@@ -6,6 +6,7 @@
 #include <ESP8266WebServer.h>
 #include "FS.h"
 #include <pu2clr_pcf8574.h>
+#include <string.h>
 
 
 PCF pcf;
@@ -19,8 +20,8 @@ using namespace std;
 #define DHTTYPE DHT22
 
 // Set WiFi credentials
-#define WIFI_SSID "KidsWifi"
-#define WIFI_PASS "xxyy123456"
+//#define WIFI_SSID "KidsWifi"
+//#define WIFI_PASS "xxyy123456"
 
 // Set WiFi credentials
 #define AP_SSID "mush-room"
@@ -114,7 +115,7 @@ ptr +="</html>\n";
 }
 
 
-String sendHTML(String form_relay_toggle_fan, vector <String> wifi_data, int Temperature, int Humidity, int co2) {
+String sendHTML(String form_relay_toggle_fan, vector <String> wifi_data, int Temperature, int Humidity, int co2, vector <String> ap_data) {
 
 String ptr ="<!doctype html>\n";
 ptr +="<html lang=\"en\">\n";
@@ -211,9 +212,18 @@ ptr +=wifi_data[2];
 ptr += "\" name=\"cl_pass\" size=\"10\"/></li>\n";
 ptr +="                </ul>\n";
 ptr +="                <ul class=\"list-unstyled\">\n";
-ptr +="                    <li class=\"li-more-margin\">Enable AP Network : <input class=\"c\" name=\"ap_active\" type=\"checkbox\"/></li>\n";
-ptr +="                    <li>SSID <input name=\"ap_ssid\" size=\"10\" value=\"mush-room\"/></li>\n";
-ptr +="                    <li>Pass <input name=\"ap_pass\" size=\"10\" value=\"86753099\"/></li>\n";
+if (ap_data[0] == "on") {
+ptr +="                    <li class=\"li-more-margin\">Enable AP Network : <input class=\"c\" name=\"ap_active\" type=\"checkbox\"/ checked></li>\n";
+}else{
+ptr +="                    <li class=\"li-more-margin\">Enable AP Network : <input class=\"c\" name=\"ap_active\" type=\"checkbox\"/ ></li>\n";
+}
+ptr +="                    <li>SSID <input value=\"";
+ptr +=ap_data[1];
+ptr += "\" name=\"ap_ssid\" size=\"10\"/></li>\n";
+
+ptr +="                    <li>Pass <input value=\"";
+ptr +=ap_data[2];
+ptr += "\" name=\"ap_pass\" size=\"10\"/></li>\n";               
 ptr +="                </ul>\n";
 ptr +="            </div>\n";
 ptr +="            <button type=\"submit\" class=\"btn btn-lg btn-block btn-primary\">Save</button>\n";
@@ -580,17 +590,24 @@ if (stateMenu == "main_menu" && button == LOW){
       loopTime = 200;
       return 0;
     }
+    if (stateMenu == "relay_toggle" && button2 == LOW){
+      stateMenu = "relay_toggle_hum";
+      displayed = 0;
+      loopTime = 200;
+      return 0;
+    }
+
     if (stateMenu == "relay_toggle_fan" && button == LOW){
       stateMenu = "relay_toggle_fan";
       displayed = 0;
-      relay_fan_toggle = 0;
+      relay_fan_toggle = 1;
       loopTime = 200;
       return 0;
     }
     if (stateMenu == "relay_toggle_fan" && button2 == LOW){
       stateMenu = "relay_toggle_fan";
       displayed = 0;
-      relay_fan_toggle = 1;
+      relay_fan_toggle = 0;
       loopTime = 200;
       return 0;
     }
@@ -598,14 +615,14 @@ if (stateMenu == "main_menu" && button == LOW){
      if (stateMenu == "relay_toggle_hum" && button == LOW){
       stateMenu = "relay_toggle_hum";
       displayed = 0;
-      relay_hum_toggle = 0;
+      relay_hum_toggle = 1;
       loopTime = 200;
       return 0;
     }
     if (stateMenu == "relay_toggle_hum" && button2 == LOW){
       stateMenu = "relay_toggle_hum";
       displayed = 0;
-      relay_hum_toggle = 1;
+      relay_hum_toggle = 0;
       loopTime = 200;
       return 0;
     }
@@ -722,14 +739,14 @@ if (stateMenu == "env_menu" && button == LOW){
       menuDisplay[2] = { "toggle" };
       return 0;
     }
+  //if (stateMenu == "env_alert" && button == LOW){
+  //    //env menu temp
+  //    stateMenu = "env_alert_1";
+  //    displayed = 0;
+  //    loopTime = 200;
+  //    return 0;
+  //  }
   if (stateMenu == "env_alert" && button == LOW){
-      //env menu temp
-      stateMenu = "env_alert_1";
-      displayed = 0;
-      loopTime = 200;
-      return 0;
-    }
-  if (stateMenu == "env_alert_1" && button == LOW){
       //env menu temp
       stateMenu = "env_alert_temp";
       displayed = 0;
@@ -1336,8 +1353,8 @@ void setup() {
   dht.begin();
   u8g2.begin();
   
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(ssid, pass);
+  //WiFi.mode(WIFI_AP_STA);
+  //WiFi.softAP(ssid, pass);
   
   u8g2.enableUTF8Print();
   //SPIFFS.begin();
@@ -1348,10 +1365,28 @@ void setup() {
     }
   
   
-  if (wifi_data[0] == "on") {
+  
+
+  
+  String active = "on";
+  
+  Serial.println("Wifi data:");
+
+
+  
+  Serial.println(wifi_data[0]);
+  
+  Serial.println(wifi_data[0].length());
+  Serial.println(active.length());
+  Serial.println(wifi_data[1]);
+  Serial.println(wifi_data[2]);
+  
+  if (wifi_data[0] == "on" ) {
     Serial.println("Wifi enabled");
     enableWifi();
   }
+  
+
     
 
   server.begin();
@@ -1411,6 +1446,8 @@ void setup() {
 int counter = 0;
 
 void loop() {
+
+  
 
   server.handleClient();
   if (stateMenu == "sensor_data") {
@@ -1511,7 +1548,7 @@ void loop() {
 
 void handleRoot() {
   String form_relay_toggle_fan="";
-  server.send(200, "text/html", sendHTML(form_relay_toggle_fan, wifi_data, Temperature, Humidity, sgp.eCO2) );   // Send HTTP status 200 (Ok) and send some text to the browser/client
+  server.send(200, "text/html", sendHTML(form_relay_toggle_fan, wifi_data, Temperature, Humidity, sgp.eCO2, ap_data) );   // Send HTTP status 200 (Ok) and send some text to the browser/client
 }
 
 void handleNotFound(){
@@ -1568,6 +1605,39 @@ void handleForm() {
   Serial.println(form_relay_limit_co2);
   Serial.println(form_relay_toggle_hum);
   Serial.println(form_relay_toggle_fan);
+
+  if (form_cl_active !=wifi_data[0] || form_cl_ssid != wifi_data[1] || form_cl_pass !=wifi_data[2]){
+
+      wifi_data[0] = form_cl_active;
+      wifi_data[1] = form_cl_ssid;
+      wifi_data[2] = form_cl_pass;
+      
+      writeStoredWifiData();
+      
+
+   }
+   if (form_ap_active != ap_data[0] || form_ap_ssid != ap_data[1] || form_ap_pass != ap_data[2]){
+
+      ap_data[0] = form_cl_active;
+      ap_data[1] = form_cl_ssid;
+      ap_data[2] = form_cl_pass;
+      
+      writeStoredApData();     
+   }
+   
+   // no form of wifi is active, probabaly a bad thing
+   if(form_ap_active != "on" && form_cl_active != "on")
+   {
+
+    //handle this somehow
+    
+    }
+
+   if (form_ap_active != ap_data[0] || form_cl_active !=wifi_data[0] )
+   {
+    
+    ESP.reset();
+    }
   
 
   if (form_relay_toggle_fan == "on")
@@ -1579,7 +1649,7 @@ void handleForm() {
       handle_RelayOff();
       }
     
-  server.send(200, "text/html", sendHTML(form_relay_toggle_fan, wifi_data, Temperature, Humidity, sgp.eCO2) );
+  server.send(200, "text/html", sendHTML(form_relay_toggle_fan, wifi_data, Temperature, Humidity, sgp.eCO2, ap_data) );
   
   webUpdate();
 
@@ -1596,6 +1666,113 @@ void handle_RelayOff(){
  digitalWrite(Relay1, LOW);
 };
 
+
+void writeStoredWifiData(){
+
+
+  File file = SPIFFS.open("/wifi.txt", "w");
+  if (!file) {
+    Serial.println("wifi.txt failed to open file for writing");
+    return;
+   }
+   
+  file.println(wifi_data[0]);
+  file.println(wifi_data[1]);
+  file.println(wifi_data[2]);
+     
+
+  
+  
+
+  Serial.println("Wifi data stored");
+  Serial.println('\n');
+   Serial.println("**********************");
+   Serial.println("*                    *");
+   Serial.println("*  wifi file verify  *");
+   Serial.println("*                    *");
+   Serial.println("**********************");
+   Serial.println('\n');
+   Serial.println("Contents:");
+
+
+  
+  while (file.available()) {
+    wifi_data.push_back(file.readStringUntil('\n'));
+    Serial.println("validating wifi file....");
+    }
+   file.close();
+
+   
+
+   for (String s : wifi_data ) {
+    
+    Serial.println(s);
+    
+    }
+    wifi_data[0].replace("\r","");
+    wifi_data[1].replace("\r","");
+    wifi_data[2].replace("\r","");
+    //enableWifi();
+   
+
+}
+
+void writeStoredApData(){
+
+
+  File file = SPIFFS.open("/ap.txt", "w");
+  if (!file) {
+    Serial.println("ap.txt failed to open file for writing");
+    return;
+   }
+   
+  file.println(ap_data[0]);
+  file.println(ap_data[1]);
+  file.println(ap_data[2]);
+     
+
+  
+  
+
+  Serial.println("ap data stored");
+  Serial.println('\n');
+   Serial.println("**********************");
+   Serial.println("*                    *");
+   Serial.println("*  ap file verify  *");
+   Serial.println("*                    *");
+   Serial.println("**********************");
+   Serial.println('\n');
+   Serial.println("Contents:");
+
+
+  
+  while (file.available()) {
+    ap_data.push_back(file.readStringUntil('\n'));
+    Serial.println("validating ap file....");
+    }
+   file.close();
+
+   
+
+   for (String s : ap_data ) {
+    
+    Serial.println(s);
+    
+    }
+    ap_data[0].replace("\r","");
+    ap_data[1].replace("\r","");
+    ap_data[2].replace("\r","");
+    //enableWifi();
+   
+
+}
+
+
+
+
+
+
+
 void readStoredData(){
 
   
@@ -1609,18 +1786,33 @@ void readStoredData(){
    }
 
    
+   Serial.println('\n');
+   Serial.println("**********************");
+   Serial.println("*                    *");
+   Serial.println("*  wifi file read    *");
+   Serial.println("*                    *");
+   Serial.println("**********************");
+   Serial.println('\n');
+   Serial.println("Contents:");
 
    while (file.available()) {
     wifi_data.push_back(file.readStringUntil('\n'));
     Serial.println("reading wifi file....");
+    
     }
    file.close();
+   Serial.println('\n');
 
    for (String s : wifi_data ) {
+    
     
     Serial.println(s);
     
     }
+    wifi_data[0].replace("\r","");
+    wifi_data[1].replace("\r","");
+    wifi_data[2].replace("\r","");
+    
     
     // read ap data
     
