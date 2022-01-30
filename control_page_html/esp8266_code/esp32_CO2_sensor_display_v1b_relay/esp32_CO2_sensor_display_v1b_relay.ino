@@ -2,13 +2,16 @@
 #include <U8g2lib.h>
 #include <stdio.h>
 #include "Adafruit_SGP30.h"
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include "FS.h"
+#include "SPIFFS.h"
+#include <WiFi.h>
+#include <WebServer.h>
+#include "Vector.h"
 
-ESP8266WebServer server(80);
 
 
+
+WebServer server(80);
 
 #include "DHT.h"
 
@@ -24,16 +27,14 @@ ESP8266WebServer server(80);
 
 
 Adafruit_SGP30 sgp;
+
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
 
 const char* ssid = "mush-room";
 const char* pass = "86753099";
 
 const char* wifi_ssid = "KidsWifi";
-const char* wifi_pass = "";
-
-
-
+const char* wifi_pass = "xxyy123456";
 
 
 // const char COPYRIGHT_SYMBOL[] = { 0xa9, '\0' };
@@ -50,15 +51,15 @@ char *charSet[]= {"A", "B", "C"};
 * @param temperature [°C]
 * @param humidity [%RH]
 */
-uint8_t DHTPin = D7; 
+uint8_t DHTPin = 7; 
 DHT dht(DHTPin, DHTTYPE); 
 //const int Push_button_1 = 13;
 
-uint8_t Push_button_2 = D5;
-uint8_t Push_button_1 = D6;
-uint8_t Push_button_3 = D7;
+uint8_t Push_button_2 = 5;
+uint8_t Push_button_1 = 6;
+uint8_t Push_button_3 = 7;
 
-uint8_t Relay1 = D8;
+uint8_t Relay1 = 8;
 
 
 int loopTime = 1000;
@@ -1313,20 +1314,20 @@ void setup() {
     }
 
   Serial.println();
-  Serial.print("Connected to WIFI ");
+  Serial.print("Connected to WIFI 1234 ");
   Serial.println(WiFi.localIP());
   
   server.begin();
   u8g2.enableUTF8Print();
   SPIFFS.begin();
-  readStoredData();
+  //readStoredData();
   
-  pinMode(Push_button_1,INPUT);
-  pinMode(Push_button_2,INPUT);
-  pinMode(Push_button_3,INPUT);
-  pinMode(Relay1,OUTPUT);
+  //pinMode(Push_button_1,INPUT);
+  //pinMode(Push_button_2,INPUT);
+  //pinMode(Push_button_3,INPUT);
+  //pinMode(Relay1,OUTPUT);
   //WiFi.mode(WIFI_AP);
-  
+  Serial.println("Server loaded");
   server.on("/", handleRoot);
   server.on("/submit_page", handleForm);
   server.on("/test", fileindex);
@@ -1341,10 +1342,10 @@ void setup() {
   server.on("/relay_on", handle_RelayOn);
   server.on("/relay_off", handle_RelayOff);
 
+   
 
 
-
-  //Serial.print("IP address for network ");
+  Serial.print("IP address for network ");
   //Serial.print(AP_SSID);
   //Serial.print(" : ");
   //Serial.print(WiFi.softAPIP());
@@ -1566,10 +1567,10 @@ void readStoredData(){
     return;
    }
 
-   vector<String> v;
+   Vector<String> v;
 
-   while (file.availible()) {
-    v.push_back(file.readStringUntil("\n"));
+   while (file.available()) {
+    v.push_back(file.readStringUntil('\n'));
     
     }
    file.close();
@@ -1581,4 +1582,3 @@ void readStoredData(){
     
    }
   
-  };
