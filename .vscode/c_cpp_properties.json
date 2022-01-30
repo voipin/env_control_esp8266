@@ -6,6 +6,7 @@
                 "${workspaceFolder}/**",
                 "C://Users//nasty//AppData//Local//Arduino15//**",
                 "C://Users//nasty//Documents//Arduino//libraries//**",
+                "C:/Users/nasty/AppData/Local/Arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/3.0.4-gcc10.3-1757bed/xtensa-lx106-elf/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -14,7 +15,7 @@
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64"
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4
